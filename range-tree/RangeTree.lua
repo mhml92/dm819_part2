@@ -4,38 +4,82 @@ local Class = require "middleclass/middleclass"
 local RangeTree = Class('RangeTree')
 
 function RangeTree:initialize(P)
-
    -- Set of nd points
    self.P = P
 
-
    -- The root of the tree
    self.T = self:BuildNDRangeTree(P,1,true)
-
+   self.result = {}
 end
 
-
-function RangeTree:FindSplitNode()
-end
-
-function RangeTree:BuildNDRangeTree(P,level,sort)
-   print(level)
-   if sort then
-      table.sort(P,
-         -- composit number space comparetor
-         function(a,b) 
-            local l = level 
-            while a[l] == b[l] and l < #a do
-               l = l + 1
-            end
-            return a[l] < b[l]
-         end
-      )
+function RangeTree:deepcopy(orig)
+   local orig_type = type(orig)
+   local copy
+   if orig_type == 'table' then
+      copy = {}
+      for orig_key, orig_value in next, orig, nil do
+         copy[self:deepcopy(orig_key)] = self:deepcopy(orig_value)
+      end
+      setmetatable(copy, self:deepcopy(getmetatable(orig)))
+   else -- number, string, boolean, etc
+      copy = orig
    end
+   return copy
+end
+
+
+function RangeTree:reportSubtree(node)
+   if self:isLeaf(node) then
+      table.insert(self.result,node.value)
+   else
+      RangeTree:reportSubtree(node.left)
+      RangeTree:reportSubtree(node.right)
+   end
+end
+
+function RangeTree:isLeaf(v)
+   if v.left == nil and v.right == nil then
+      return true
+   else 
+      return false
+   end
+end
+
+function RangeTree:FindSplitNode(node,range,level)
+   local x,x_p = range[level].min,range[level].max
+   local v = node
+   while not self:isLeaf(v) and (x_p <= v.value[level] or x > v.value[level]) do
+      if x_p <= v.value[level] then
+         v = v.left 
+      else
+         v = v.right
+      end
+   end
+   return v
+end
+
+function RangeTree:BuildNDRangeTree(PP,level,sort)
+   local P = self:deepcopy(PP)
+   if sort then
+      --print("sort on level: "..level)
+      table.sort(P,
+      -- composit number space comparetor
+      function(a,b) 
+         local l = level 
+         while a[l] == b[l] and l < #a do
+            l = l + 1
+         end
+         return a[l] < b[l]
+      end)
+   end
+
    local v = {}
    if level < #P[1] then
       v.T_assoc = self:BuildNDRangeTree(P,level+1,true)
+   else
+      v.T_assoc = nil
    end
+
    if #P == 1 then
       v.value = P[1]
       v.left = nil
@@ -58,11 +102,62 @@ function RangeTree:BuildNDRangeTree(P,level,sort)
    return v
 end
 
-function RangeTree:NDRangeQuery()
-end
+function RangeTree:NDRangeQuery(node,range,level)
+   local v_split = self:FindSplitNode(node,range,level)
+   if self:isLeaf(v_split) then
+      if range[level].min <= v_split.value[level] and v_split.value[level] <= range[level].max then
+         if #range == level then
+            self:reportSubtree(v_split)
+         else
+            self:NDRangeQuery(v_split.T_assoc,range,level+1)
+         end
+      end
+   else
+      -- LEFT SUBTEE
+      local v = v_split.left
+      while not self:isLeaf(v) do
+         if range[level].min <= v.value[level] then
+            if #range == level then
+               self:reportSubtree(v.right)
+            else
+               self:NDRangeQuery(v.right.T_assoc,range,level+1)
+            end
+            v = v.left
+         else
+            v = v.right
+         end
+      end
+      if range[level].min <= v.value[level] then
+         if #range == level then
+            self:reportSubtree(v)
+         else
+            self:NDRangeQuery(v.T_assoc,range,level+1)
+         end
+      end
 
--- Composit number space comparetor
-function RangeTree:compare(p1,p2,d)
+       
+      -- RIGHT SUBTEE
+      v = v_split.right
+      while not self:isLeaf(v) do
+         if range[level].max >= v.value[level] then
+            if #range == level then
+               self:reportSubtree(v.left)
+            else
+               self:NDRangeQuery(v.left.T_assoc,range,level+1)
+            end
+            v = v.right
+         else
+            v = v.left
+         end
+      end
+      if range[level].max >= v.value[level] then
+         if #range == level then
+            self:reportSubtree(v)
+         else
+            self:NDRangeQuery(v.T_assoc,range,level+1)
+         end
+      end
+   end
 end
 
 return RangeTree
