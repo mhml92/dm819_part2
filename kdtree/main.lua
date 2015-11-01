@@ -116,19 +116,23 @@ local function FULLYCONTAINED(R, region)
 	return true
 end
 
+--initiate pointers to reports and function
+local reports, reportfunc = {}, function () end
+
 local function SEARCHKDTREE(v, R, region, depth)
 	if v == nil then
 		return
 	end
 	--default values
-	depth = depth or 0
-	region = region or {{},{}}
+	local depth = depth or 0
+	local region = region or {{},{}}
 
 	--#R[1] == dimension of R
 	
 	if v.left == nil and v.right == nil then
 		if CHECKINRANGE(v.val, R) then 
 			print("REPORTED MOTHERFUCKER " .. I(v.val)) --should be reported
+			reportfunc(v)
 		end
 	else
 
@@ -137,6 +141,7 @@ local function SEARCHKDTREE(v, R, region, depth)
 		local lregion = REGION(v.val, d, region, "left")
 		if FULLYCONTAINED(R, lregion) then
 			print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.left)) --report whole left tree
+			reportfunc(v.left)
 		else
 			if INTERSECTION(R, lregion) then
 				SEARCHKDTREE(v.left, R, lregion, depth+1)
@@ -148,6 +153,7 @@ local function SEARCHKDTREE(v, R, region, depth)
 		local rregion = REGION(v.val, d, region, "right")
 		if FULLYCONTAINED(R, rregion) then
 			print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.right)) --report whole left tree
+			reportfunc(v.right)
 		else
 			if INTERSECTION(R, rregion) then
 				SEARCHKDTREE(v.right, R, rregion, depth+1)
@@ -159,17 +165,59 @@ local function SEARCHKDTREE(v, R, region, depth)
 end
 
 
+local function INITKDSEARCH(tree, R, region)
+	--change pointers
+	reports = {}
+	local function REPORTSUBTREE(v)
+		if v.left == nil and v.right == nil then
+			table.insert(reports, v.val)
+		else
+			if v.left then
+				REPORTSUBTREE(v.left)
+			end
+			if v.right then
+				REPORTSUBTREE(v.right)
+			end
+		end
+	end
+	reportfunc = REPORTSUBTREE
+
+	SEARCHKDTREE(tree, R, region)
+
+	return reports
+end
+
+local function naiveMaxMinRegion(list)
+	local region = {{},{}}
+
+	local max,min = math.max,math.min
+
+	for _,node in ipairs(list) do
+		for d,v in ipairs(node) do
+			if not region[1][d] then region[1][d] = v end
+			if not region[2][d] then region[2][d] = v end
+
+			region[1][d] = min(region[1][d],v)
+			region[2][d] = max(region[2][d],v)
+		end
+	end
+
+	return region
+end
+
 --list = {{1,2},{2,3},{3,4},{4,5},{5,6}}
 list = {{1,1},{9,9},{3,3},{4,4},{5,5},{6,6},{7,7},{8,8},{2,2},{10,10}}
+
+print("NAIVE LIST" , I(naiveMaxMinRegion(list)))
 
 local tree = BUILDKDTREE(list,0,2)
 --print(I(tree))
 
-local R = {{1,1},{4,4}}
+local R = {{1,1},{10,10}}
 
 print(I(tree))
 
-print(I(SEARCHKDTREE(tree, R, {{1,1},{10,10}})))
+print(I(INITKDSEARCH(tree, R, naiveMaxMinRegion(list))))
 
 
 
