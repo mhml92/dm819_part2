@@ -1,15 +1,14 @@
 local Class = require "middleclass/middleclass"
-
+local I = require "inspect"
 --local RBTree = require "RBTree/RBTree"
 local RangeTree = Class('RangeTree')
 
 function RangeTree:initialize(P)
    -- Set of nd points
    self.P = P
-
+   self.result = nil
    -- The root of the tree
    self.T = self:BuildNDRangeTree(P,1,true)
-   self.result = {}
 end
 
 function RangeTree:deepcopy(orig)
@@ -30,6 +29,7 @@ end
 
 function RangeTree:reportSubtree(node)
    if self:isLeaf(node) then
+      if not self.result then self.result = {} end
       table.insert(self.result,node.value)
    else
       RangeTree:reportSubtree(node.left)
@@ -110,6 +110,7 @@ end
 
 function RangeTree:NDRangeQuery(node,range,level)
    local v_split = self:FindSplitNode(node,range,level)
+
    if self:isLeaf(v_split) then
       if range[level].min <= v_split.value[level] and v_split.value[level] <= range[level].max then
          if #range == level then

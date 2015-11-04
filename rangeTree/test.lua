@@ -61,33 +61,35 @@ else
          inputfile = v
       end
    end
-   
+
    P = {}
    R = {}
    -- read input
    for l in io.lines(inputfile) do
-      if string.match(l, ":") then
-         local r = {}
-         for elem in string.gmatch(l,"[^\t]*") do
-            if elem ~= "" then
-               local tmp ={}
-               for part in string.gmatch(elem,"[^:]*") do
-                  if part ~= "" then
-                     table.insert(tmp,part)
+      if l ~= "" then
+         if string.match(l, ":") then
+            local r = {}
+            for elem in string.gmatch(l,"[^\t]*") do
+               if elem ~= "" then
+                  local tmp ={}
+                  for part in string.gmatch(elem,"[^:]*") do
+                     if part ~= "" then
+                        table.insert(tmp,part)
+                     end
                   end
+                  table.insert(r,{min = tonumber(tmp[1]),max = tonumber(tmp[2])})
                end
-               table.insert(r,{min = tonumber(tmp[1]),max = tonumber(tmp[2])})
             end
-         end
-         table.insert(R,r)
-      else
-         local point = {}
-         for elem in string.gmatch(l,"[^\t]*") do
-            if elem ~= "" then
-               table.insert(point,tonumber(elem))
+            table.insert(R,r)
+         else
+            local point = {}
+            for elem in string.gmatch(l,"[^\t]*") do
+               if elem ~= "" then
+                  table.insert(point,tonumber(elem))
+               end
             end
+            table.insert(P,point)
          end
-         table.insert(P,point)
       end
    end
 
@@ -99,12 +101,12 @@ else
       measures.build_t2 = os.clock()
       measures.querys = {}
       for k,r in ipairs(R) do
-        measures.querys[k] = {}
-        local q = measures.querys[k]
-        q.t1 = os.clock()
-        local res = rt:findPointsInRange(r)
-        q.t2 = os.clock()
-        q.outSize = #res
+         measures.querys[k] = {}
+         local q = measures.querys[k]
+         q.t1 = os.clock()
+         local res = rt:findPointsInRange(r)
+         q.t2 = os.clock()
+         q.outSize = #res
       end
       print("alg\tn\toutputSize\tbuildTime\tsearchTime") 
       for k,v in ipairs(measures.querys) do
@@ -114,7 +116,9 @@ else
       local rt = RangeTree:new(P)
       local res = {}
       for k,r in ipairs(R) do
-        table.insert(res,rt:findPointsInRange(r))
+      print("-----------------------------------")
+         local result = rt:findPointsInRange(r)
+         table.insert(res,result)
       end
       for k,v in ipairs(res) do
          for k1,v1 in ipairs(v) do
