@@ -58,6 +58,12 @@ function RangeTree:FindSplitNode(node,range,level)
    return v
 end
 
+function RangeTree:findPointsInRange(range)
+   self.result = {}
+   self:NDRangeQuery(self.T,range,1)
+   return self.result
+end
+
 function RangeTree:BuildNDRangeTree(PP,level,sort)
    local P = self:deepcopy(PP)
    if sort then
