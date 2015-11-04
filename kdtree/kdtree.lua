@@ -135,7 +135,6 @@ local function SEARCHKDTREE(v, R, region, depth)
 			reportfunc(v)
 		end
 	else
-
 		local d = (depth % #R[1])+1
 
 		local lregion = REGION(v.val, d, region, "left")
@@ -218,14 +217,3 @@ local R = {{1,1},{10,10}}
 print(I(tree))
 
 print(I(INITKDSEARCH(tree, R, naiveMaxMinRegion(list))))
-
-
-
-
---list = {{1,2,4},{2,3,11},{3,4,21},{4,5,2},{5,6,13},{2,3,5},{3,4,12},{5,6,22},{5,6,3},{6,7,14}}
-
---print(I(BUILDKDTREE(list,0,3)))
-
-
-
---prettyPrint(BUILDKDTREE(list,0,3))
