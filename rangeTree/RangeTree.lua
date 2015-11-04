@@ -28,12 +28,13 @@ end
 
 
 function RangeTree:reportSubtree(node)
+   print(I(node))
    if self:isLeaf(node) then
-      if not self.result then self.result = {} end
+      --if not self.result then self.result = {} end
       table.insert(self.result,node.value)
    else
-      RangeTree:reportSubtree(node.left)
-      RangeTree:reportSubtree(node.right)
+      self:reportSubtree(node.left)
+      self:reportSubtree(node.right)
    end
 end
 
@@ -142,7 +143,6 @@ function RangeTree:NDRangeQuery(node,range,level)
             self:NDRangeQuery(v.T_assoc,range,level+1)
          end
       end
-
        
       -- RIGHT SUBTEE
       v = v_split.right
