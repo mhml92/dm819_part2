@@ -127,6 +127,7 @@ function RangeTree:NDRangeQuery(node,range,level)
             v = v.right
          end
       end
+      -- LEFT SUBTREE LEAF
       if range[level].min <= v.value[level] then
          if #range == level then
             self:reportSubtree(v)
@@ -150,6 +151,7 @@ function RangeTree:NDRangeQuery(node,range,level)
             v = v.left
          end
       end
+      -- RIGHT SUBTREE LEAF
       if range[level].max >= v.value[level] then
          if #range == level then
             self:reportSubtree(v)

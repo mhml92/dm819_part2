@@ -1,0 +1,6 @@
+input format
+# Point nd space
+<number>,...,<number>
+
+# Range in nd space
+<number> - <number>,...,<number> - <number>
