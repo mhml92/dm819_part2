@@ -1,3 +1,6 @@
 [submodule "range-tree/middleclass"]
 	path = range-tree/middleclass
 	url = https://github.com/kikito/middleclass.git
+[submodule "rangeTree/middleclass"]
+	path = rangeTree/middleclass
+	url = https://github.com/kikito/middleclass.git
