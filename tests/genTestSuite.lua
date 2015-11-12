@@ -2,7 +2,8 @@
 math.randomseed(12042015)
 
 -- input sizes
-N = {100,1000,10000,100000}
+--N = {100,1000,10000,100000}
+N = {100,1000}
 -- dimensions
 D = {1,2,3,4,5}
 -- number of ranges
