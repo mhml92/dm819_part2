@@ -1,4 +1,4 @@
-local I = require("inspect")
+I = require("kdtree/inspect")
 
 local function deepcopy(orig)
     local orig_type = type(orig)
@@ -8,7 +8,7 @@ local function deepcopy(orig)
         for orig_key, orig_value in next, orig, nil do
             copy[deepcopy(orig_key)] = deepcopy(orig_value)
         end
-        setmetatable(copy, deepcopy(getmetatable(orig)))
+        --setmetatable(copy, deepcopy(getmetatable(orig)))
     else -- number, string, boolean, etc
         copy = orig
     end
@@ -34,7 +34,7 @@ local function select(list, k, dimension)
 end
 
 local function splitListOnMedian(list,dimension)
-	local halv = math.ceil(#list/2)
+	local halv = math.floor(#list/2)
 	local median = select(list,halv, dimension)
 	local p1,p2 = {},{}
 
@@ -63,7 +63,6 @@ local function BUILDKDTREE(P,depth,dimension)
 	else 
 		local d = (depth % dimension)+1
 		local p1,p2,median = splitListOnMedian(P,d)
-
 		return createNode(median, BUILDKDTREE(p1, depth+1, dimension), BUILDKDTREE(p2, depth+1,dimension))
 	end
 end
@@ -72,7 +71,7 @@ local function CHECKINRANGE(v, R)
 	for k,val in ipairs(v) do
 
 		--if one of the values doesn't match
-		if not( R[1][k] <= val and R[2][k] >= val ) then
+		if R[k][1] and R[k][2] and not( R[k][1] <= val and R[k][2] >= val ) then
 			return false		
 		end
 	end
@@ -80,39 +79,49 @@ local function CHECKINRANGE(v, R)
 end
 
 local function INTERSECTION(R, region)
-	for i=1,#R[1] do
+	for i=1,#R do
 		--if they aren't set, we need to check further down
-		if not (region[1][i] or region[2][i]) then
+		if not (region[i][1] and region[i][2]) then
 			return true
 		end
-		if (R[1][i] <= region[1][i] and region[1][i] <= R[2][i]) or 
-		   (R[1][i] <= region[2][i] and region[2][i] <= R[2][i]) then
+		if (R[i][1] <= region[i][1] and region[i][1] <= R[i][2]) or 
+		   (R[i][1] <= region[i][2] and region[i][2] <= R[i][2]) then
 			return true
 		end	
 	end
+	print("NOT INTERSECTION:")
+	print("REGION" ..I(region))
+	print("AND")
+	print("R" ..I(R))
 	return false
 end
 
 local function REGION(halfline, d, region, orientation)
 	local region = deepcopy(region)
 
+	print(halfline, d, orientation,"Before: "..I(region))
+
+
 	if orientation == "left" then
-		region[2][d] = halfline
+		region[d][2] = math.min(region[d][2] or halfline,halfline)
 	else
-		region[1][d] = halfline
+		region[d][1] = math.max(region[d][1] or halfline,halfline)
 	end
+
+	print("","","","After: "..I(region))
 
 	return region
 end
 
 local function FULLYCONTAINED(R, region)
-	for i=1,#R[1] do
-		if not (region[1][i] and R[1][i] <= region[1][i] and 
-			    region[2][i] and R[2][i] >= region[2][i]) then
+	--if true then return false end
+
+	for i=1,#R do
+		if not (region[i][1] and R[i][1] <= region[i][1] and 
+			    region[i][2] and R[i][2] >= region[i][2]) then
 			return false
 		end	
 	end
-	print("FULLY REGION ::: " ..I(region))
 	return true
 end
 
@@ -125,39 +134,44 @@ local function SEARCHKDTREE(v, R, region, depth)
 	end
 	--default values
 	local depth = depth or 0
-	local region = region or {{},{}}
+	if not region then
+		region = {}
+		for i=1,#R do
+			region[i] = {}
+		end
+	end
 
 	--#R[1] == dimension of R
 	
 	if v.left == nil and v.right == nil then
 		if CHECKINRANGE(v.val, R) then 
-			print("REPORTED MOTHERFUCKER " .. I(v.val)) --should be reported
+			--print("REPORTED MOTHERFUCKER " .. I(v.val)) --should be reported
 			reportfunc(v)
 		end
 	else
-		local d = (depth % #R[1])+1
 
+		local d = (depth % #R)+1
 		local lregion = REGION(v.val, d, region, "left")
+		local rregion = REGION(v.val, d, region, "right")
 		if FULLYCONTAINED(R, lregion) then
-			print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.left)) --report whole left tree
+			--print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.left)) --report whole left tree
 			reportfunc(v.left)
 		else
 			if INTERSECTION(R, lregion) then
 				SEARCHKDTREE(v.left, R, lregion, depth+1)
 			else
-				print("NOT INTERSECTION" .. I(v))
+				--print("NOT INTERSECTION" .. I(v))
 			end
 		end
 
-		local rregion = REGION(v.val, d, region, "right")
 		if FULLYCONTAINED(R, rregion) then
-			print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.right)) --report whole left tree
+			--print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.right)) --report whole left tree
 			reportfunc(v.right)
 		else
 			if INTERSECTION(R, rregion) then
 				SEARCHKDTREE(v.right, R, rregion, depth+1)
 			else
-				print("NOT INTERSECTION" .. I(v))
+				--print("NOT INTERSECTION" .. I(v))
 			end
 		end
 	end
@@ -168,7 +182,9 @@ local function INITKDSEARCH(tree, R, region)
 	--change pointers
 	reports = {}
 	local function REPORTSUBTREE(v)
+		if not v then return end
 		if v.left == nil and v.right == nil then
+			CHECKINRANGE(v, R)
 			table.insert(reports, v.val)
 		else
 			if v.left then
@@ -181,23 +197,29 @@ local function INITKDSEARCH(tree, R, region)
 	end
 	reportfunc = REPORTSUBTREE
 
+	--print(I(tree))
+
+	--print("TEST INPUT",I(R),I(region))
 	SEARCHKDTREE(tree, R, region)
 
 	return reports
 end
 
 local function naiveMaxMinRegion(list)
-	local region = {{},{}}
+	local region = {}
+	for i=1,#list[1] do
+		region[i] = {}
+	end
 
 	local max,min = math.max,math.min
 
 	for _,node in ipairs(list) do
 		for d,v in ipairs(node) do
-			if not region[1][d] then region[1][d] = v end
-			if not region[2][d] then region[2][d] = v end
+			if not region[d][1] then region[d][1] = v end
+			if not region[d][2] then region[d][2] = v end
 
-			region[1][d] = min(region[1][d],v)
-			region[2][d] = max(region[2][d],v)
+			region[d][1] = min(region[d][1],v)
+			region[d][2] = max(region[d][2],v)
 		end
 	end
 
@@ -205,15 +227,21 @@ local function naiveMaxMinRegion(list)
 end
 
 --list = {{1,2},{2,3},{3,4},{4,5},{5,6}}
-list = {{1,1},{9,9},{3,3},{4,4},{5,5},{6,6},{7,7},{8,8},{2,2},{10,10}}
+--list = {{1,1},{9,9},{3,3},{4,4},{5,5},{6,6},{7,7},{8,8},{2,2},{10,10}}
 
-print("NAIVE LIST" , I(naiveMaxMinRegion(list)))
+--print("NAIVE LIST" , I(naiveMaxMinRegion(list)))
 
-local tree = BUILDKDTREE(list,0,2)
+--local tree = BUILDKDTREE(list,0,2)
 --print(I(tree))
 
-local R = {{1,1},{10,10}}
+--local R = {{1,1},{10,10}}
 
-print(I(tree))
+--print(I(tree))
 
-print(I(INITKDSEARCH(tree, R, naiveMaxMinRegion(list))))
+--print(I(INITKDSEARCH(tree, R, naiveMaxMinRegion(list))))
+
+return {
+	naiveMaxMinRegion = naiveMaxMinRegion,
+	INITKDSEARCH = INITKDSEARCH,
+	BUILDKDTREE = BUILDKDTREE
+}
