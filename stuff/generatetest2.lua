@@ -196,9 +196,4 @@ for i=1,#R do
 	io.write("\n")
 end
 
-print("")
-
-
-print("")
-
 

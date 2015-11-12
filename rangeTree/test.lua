@@ -10,6 +10,29 @@ local function prettyPrint(P)
    end
 end
 
+function stringSplit(inputstr, sep)
+   if sep == nil then
+      sep = "%s"
+   end
+   local t={} ; i=1
+   for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+      t[i] = str
+      i = i + 1
+   end
+   return t
+end
+
+local function isPointInRange(point,range) 
+   for rpi,rp in ipairs(range) do
+      for i,e in ipairs(rp) do
+         if e == point[i] then
+            return true
+         end
+      end
+   end
+   return false
+end
+
 local function genTestP(size,d,numRange)
    local P = {}
    math.randomseed(os.time())
@@ -61,14 +84,37 @@ else
          inputfile = v
       end
    end
+   
+   local fileName = stringSplit(inputfile,"/")
+   fileName = fileName[#fileName]
 
    P = {}
    R = {}
+   RESULTS = {}
    -- read input
    for l in io.lines(inputfile) do
       if l ~= "" then
          if string.match(l, ":") then
             local r = {}
+            -- if test contains results
+            if string.match(l,",") then
+               local res = {}
+               local rangeANDresult = {}
+               for elem in string.gmatch(l,"[^,]*") do
+                  if elem ~= "" then
+                     table.insert(rangeANDresult,elem)
+                  end
+               end
+               l = rangeANDresult[1]
+               if rangeANDresult[2] then
+                  for pointNum in string.gmatch(rangeANDresult[2],"[^\t]*") do
+                     if pointNum ~= "" then
+                        table.insert(res,pointNum)
+                     end
+                  end
+               end
+               table.insert(RESULTS,res)
+            end
             for elem in string.gmatch(l,"[^\t]*") do
                if elem ~= "" then
                   local tmp ={}
@@ -90,6 +136,7 @@ else
             end
             table.insert(P,point)
          end
+
       end
    end
 
@@ -107,16 +154,21 @@ else
          local res = rt:findPointsInRange(r)
          q.t2 = os.clock()
          q.outSize = #res
+         q.correct = true
+         for i,pointIndex in ipairs(RESULTS[k]) do
+            if not isPointInRange(P[tonumber(pointIndex)],res) then
+               q.correct = false
+            end
+         end
       end
-      print("alg\tn\toutputSize\tbuildTime\tsearchTime") 
+      print("alg\tfile\tn\toutputSize\tcorrect\tbuildTime\tsearchTime") 
       for k,v in ipairs(measures.querys) do
-         print("rangeTree\t"..measures.n.."\t"..v.outSize.."\t"..measures.build_t2-measures.build_t1.."\t"..v.t2-v.t1)
+         print("rangeTree\t"..fileName.."\t"..measures.n.."\t"..v.outSize.."\t".. tostring(v.correct) .."\t"..measures.build_t2-measures.build_t1.."\t"..v.t2-v.t1)
       end
    else
       local rt = RangeTree:new(P)
       local res = {}
       for k,r in ipairs(R) do
-      print("-----------------------------------")
          local result = rt:findPointsInRange(r)
          table.insert(res,result)
       end

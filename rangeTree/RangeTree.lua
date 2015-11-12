@@ -29,7 +29,6 @@ end
 
 function RangeTree:reportSubtree(node)
    if self:isLeaf(node) then
-      --if not self.result then self.result = {} end
       table.insert(self.result,node.value)
    else
       self:reportSubtree(node.left)
