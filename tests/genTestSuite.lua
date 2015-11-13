@@ -2,8 +2,8 @@
 math.randomseed(12042015)
 
 -- input sizes
---N = {100,1000,10000,100000}
-N = {100,1000}
+N = {100,1000,10000,100000}
+--N = {100,1000}
 -- dimensions
 D = {1,2,3,4,5}
 -- number of ranges
@@ -23,7 +23,7 @@ for di,d in ipairs(D) do
          local s = S(n,d)
          local rs = RS(s,d)
          local fileName = currentDir.."/".."n_"..n.."_d_"..d.."_r_"..r.."_s_"..s.."_rs_"..rs..".txt"
-         local command = "lua createCustomTest.lua -n " ..n .." -d " ..d.." -r "..r.." -s ".. s.." -rs "..rs.." > "..fileName 
+         local command = "luajit createCustomTest.lua -n " ..n .." -d " ..d.." -r "..r.." -s ".. s.." -rs "..rs.." > "..fileName 
          print()
          print("creating file:\t"   .. fileName) 
          print("with command:\t"    .. command)

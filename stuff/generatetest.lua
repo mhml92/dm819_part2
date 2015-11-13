@@ -3,6 +3,7 @@ if not tonumber(arg[1])  then
 	os.exit()
 end
 
+I =require("kdtree.inspect")
 
 --inputs
 for i=1,#arg do 
@@ -58,11 +59,34 @@ local dims = {}
 for i=1,dimension do
 	dims[i] = {}
 end
+points = {}
 for i=1,test_size do
+	points[i] = {}
 	for j=1,dimension do
 		local r = rand()
-		io.write(r)
+		table.insert(points[i],r)
 		table.insert(dims[j], r)
+	end
+end
+
+--make sure we dont have duplicate points
+for i=1,test_size do
+	for j=i+1,test_size do
+		local founds = 0
+		for d=1,dimension do
+			if points[i][d] == points[j][d] then
+				founds = founds + 1
+			end
+		end
+		if founds == dimension then
+			points[j][dimension] = points[j][dimension]+1
+		end
+	end
+end
+
+for i=1,test_size do
+	for j=1,dimension do
+		io.write(points[i][j])
 		if not (j == dimension) then
 			io.write("\t")
 		end

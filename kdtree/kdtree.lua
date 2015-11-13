@@ -1,4 +1,4 @@
-I = require("kdtree/inspect")
+I = require("inspect")
 
 local function deepcopy(orig)
     local orig_type = type(orig)
@@ -54,6 +54,7 @@ end
 
 --?d kd-tree
 local function BUILDKDTREE(P,depth,dimension)
+	depth = depth or 0
 	local P = deepcopy(P)
 	if #P == 0 then
 		return nil
@@ -63,7 +64,7 @@ local function BUILDKDTREE(P,depth,dimension)
 	else 
 		local d = (depth % dimension)+1
 		local p1,p2,median = splitListOnMedian(P,d)
-		return createNode(median, BUILDKDTREE(p1, depth+1, dimension), BUILDKDTREE(p2, depth+1,dimension))
+		return createNode(median, BUILDKDTREE(p1, depth+1, dimension), BUILDKDTREE(p2, depth+1,dimension)), collectgarbage("count")
 	end
 end
 
@@ -89,17 +90,17 @@ local function INTERSECTION(R, region)
 			return true
 		end	
 	end
-	print("NOT INTERSECTION:")
-	print("REGION" ..I(region))
-	print("AND")
-	print("R" ..I(R))
+	--print("NOT INTERSECTION:")
+	--print("REGION" ..I(region))
+	--print("AND")
+	--print("R" ..I(R))
 	return false
 end
 
 local function REGION(halfline, d, region, orientation)
 	local region = deepcopy(region)
 
-	print(halfline, d, orientation,"Before: "..I(region))
+	--print(halfline, d, orientation,"Before: "..I(region))
 
 
 	if orientation == "left" then
@@ -108,7 +109,7 @@ local function REGION(halfline, d, region, orientation)
 		region[d][1] = math.max(region[d][1] or halfline,halfline)
 	end
 
-	print("","","","After: "..I(region))
+	--print("","","","After: "..I(region))
 
 	return region
 end
@@ -117,10 +118,12 @@ local function FULLYCONTAINED(R, region)
 	--if true then return false end
 
 	for i=1,#R do
-		if not (region[i][1] and R[i][1] <= region[i][1] and 
-			    region[i][2] and R[i][2] >= region[i][2]) then
-			return false
-		end	
+		if (region[i][1] and region[i][2]) then
+			if not (R[i][1] <= region[i][1] and 
+				    R[i][2] >= region[i][2]) then
+				return false
+			end	
+		end
 	end
 	return true
 end
@@ -200,7 +203,7 @@ local function INITKDSEARCH(tree, R, region)
 	--print(I(tree))
 
 	--print("TEST INPUT",I(R),I(region))
-	SEARCHKDTREE(tree, R, region)
+	SEARCHKDTREE(tree, R, region, 0)
 
 	return reports
 end
