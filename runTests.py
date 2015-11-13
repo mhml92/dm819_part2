@@ -32,10 +32,11 @@ def testTree(folder):
                     os.chdir(folder)
 
                     outputFileName = folder + "_" + f
-                    outputDir = os.path.join("..","testResults")
-                    command = "lua test.lua " + os.path.join("..",dirname, subdirname,f) + " -R > " + os.path.join(outputDir,outputFileName)
+                    outputDir = os.path.join("..","results")
+                    command = "timeout 5m lua test.lua " + os.path.join("..",dirname, subdirname,f) + " -R > " + os.path.join(outputDir,outputFileName)
                     print(command)
                     os.system(command)
                     os.chdir("..")
 
 testTree("rangeTree")
+testTree("kdtree")
