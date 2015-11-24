@@ -148,6 +148,8 @@ else
       measures.build_t1 = os.clock()
       local rt,gb = kd.BUILDKDTREE(P, 0, #P[1])
       measures.build_t2 = os.clock()
+      collectgarbage("collect")
+      gb = collectgarbage("count")
       measures.querys = {}
       for k,r in ipairs(R) do
          measures.querys[k] = {}
@@ -163,9 +165,9 @@ else
             end
          end
       end
-      print("alg\tfile\tn\toutputSize\tcorrect\tbuildTime\tsearchTime\tmemory") 
+      print("alg\tfile\tn\toutputSize\tcorrect\tbuildTime\tsearchTime\tmemory\tdim") 
       for k,v in ipairs(measures.querys) do
-         print("kdTree\t"..fileName.."\t"..measures.n.."\t"..v.outSize.."\t".. tostring(v.correct) .."\t"..measures.build_t2-measures.build_t1.."\t"..v.t2-v.t1,gb/1024)
+         print("kdTree\t"..fileName.."\t"..measures.n.."\t"..v.outSize.."\t".. tostring(v.correct) .."\t"..measures.build_t2-measures.build_t1.."\t"..v.t2-v.t1,gb/1024 .. "\t" .. #P[1])
       end
    else
       local rt = kd.BUILDKDTREE(P)

@@ -2,12 +2,31 @@
 math.randomseed(12042015)
 
 -- input sizes
-N = {100,1000,10000,100000}
+N = {
+   100,
+   125,
+   156,
+   195,
+   243,
+   303,
+   378,
+   472,
+   590,
+   737,
+   921,
+   1151,
+   1438,
+   1797,
+   2246,
+   2807
+}
+
+
 --N = {100,1000}
 -- dimensions
 D = {1,2,3,4,5}
 -- number of ranges
-R = {5}
+R = {1000}
 -- size of dimensions
 S = function(n,d) return n^(1/d) end
 -- range sizes

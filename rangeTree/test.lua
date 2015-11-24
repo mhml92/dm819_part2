@@ -146,6 +146,8 @@ else
       measures.build_t1 = os.clock()
       local rt = RangeTree:new(P)
       measures.build_t2 = os.clock()
+         collectgarbage("collect")
+      measures.memory = collectgarbage("count")/1024
       measures.querys = {}
       for k,r in ipairs(R) do
          measures.querys[k] = {}
@@ -161,9 +163,9 @@ else
             end
          end
       end
-      print("alg\tfile\tn\toutputSize\tcorrect\tbuildTime\tsearchTime") 
+      print("alg\tfile\tn\toutputSize\tcorrect\tbuildTime\tsearchTime\tmemory\tdim") 
       for k,v in ipairs(measures.querys) do
-         print("rangeTree\t"..fileName.."\t"..measures.n.."\t"..v.outSize.."\t".. tostring(v.correct) .."\t"..measures.build_t2-measures.build_t1.."\t"..v.t2-v.t1)
+         print("rangeTree\t"..fileName.."\t"..measures.n.."\t"..v.outSize.."\t".. tostring(v.correct) .."\t"..measures.build_t2-measures.build_t1.."\t"..v.t2-v.t1 .. "\t" .. measures.memory .. "\t" .. #P[1])
       end
    else
       local rt = RangeTree:new(P)
