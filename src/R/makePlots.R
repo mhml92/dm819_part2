@@ -1,4 +1,4 @@
-setwd("~/Dropbox/Datalogi/dm819/assignments/assignment2/R")
+setwd("/home/mikkel/Dropbox/Datalogi/dm819/assignments/assignment2/src/R/")
 library(ggplot2)
 
 
@@ -8,16 +8,22 @@ files <- files[which(file.info(files)$size>0)]
 data <- do.call(rbind, lapply(files, read.table, header=TRUE, sep="\t"))
 
 ggplot(data,aes(factor(dim),searchTime,color = alg)) +
-   geom_boxplot(outlier.size = 1,outlier.colour = "grey") +
-   #geom_point() +
-   #scale_x_log10() + 
+   geom_boxplot(outlier.size = 1,outlier.colour = "darkgrey") +
    scale_y_log10()
 
-ggplot(data,aes(n,memory,color = alg)) +
+data_rangeTree <- data[which(data$alg == "rangeTree"),]
+data_kdTree <- data[which(data$alg == "kdTree"),]
+
+ggplot(data_rangeTree,aes(n,memory,color = factor(dim))) +
+   theme(legend.position="top") + 
    ggtitle("Memory vs input size") + 
-   geom_point(aes(shape=factor(dim)),size = 2,alpha=0.5)+
-   scale_shape_manual(values = c(1,2,3,4,5)) +
-   scale_x_log10() + 
-   scale_y_log10()
-   #ylim(0,0.00000075)
+   geom_point() + 
+   geom_line(alpha = 0.5)+
+   scale_x_log10(breaks=unique(data_rangeTree$n))
 
+ggplot(data_kdTree,aes(n,memory,color = factor(dim))) +
+   theme(legend.position="top") + 
+   ggtitle("Memory vs input size") + 
+   geom_point() + 
+   geom_line(alpha = 0.5)+
+   scale_x_log10(breaks=unique(data_kdTree$n))
