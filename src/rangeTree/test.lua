@@ -25,8 +25,12 @@ end
 local function isPointInRange(point,range) 
    for rpi,rp in ipairs(range) do
       for i,e in ipairs(rp) do
-         if e == point[i] then
-            return true
+         if e ~= point[i] then
+            break
+         else
+            if i == #point then
+               return true
+            end
          end
       end
    end
