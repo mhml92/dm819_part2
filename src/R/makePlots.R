@@ -1,7 +1,6 @@
 setwd("/home/mikkel/Dropbox/Datalogi/dm819/assignments/assignment2/src/R/")
 library(ggplot2)
 
-
 testDir <- "../results"
 files <- list.files(path=testDir, pattern="*.txt", full.names=T, recursive=FALSE)
 files <- files[which(file.info(files)$size>0)]
@@ -27,3 +26,28 @@ ggplot(data_kdTree,aes(n,memory,color = factor(dim))) +
    geom_point() + 
    geom_line(alpha = 0.5)+
    scale_x_log10(breaks=unique(data_kdTree$n))
+
+# rangetree searchtime/outputsize
+
+rt <- data[which(data$alg == "rangeTree"),]
+ggplot(
+   rt[which(rt$dim == 5),],
+   aes(
+      x = outputSize,
+      y = searchTime,
+      color = factor(dim),
+      shape = factor(alg))
+   ) +
+   geom_point(alpha=0.5) +
+   theme(legend.position="top")  
+
+ggplot(
+   data[which(data$alg == "kdTree"),],
+   aes(
+      x = outputSize,
+      y = searchTime,
+      color = factor(dim),
+      shape = factor(alg))
+   ) +
+   theme(legend.position="top") + 
+   geom_point() 
