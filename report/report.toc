@@ -1,9 +1,13 @@
 \contentsline {section}{\numberline {1}Introduction}{1}{section.1}
-\contentsline {section}{\numberline {2}KD-Tree}{2}{section.2}
-\contentsline {subsection}{\numberline {2.1}Complexity}{2}{subsection.2.1}
-\contentsline {section}{\numberline {3}Range-Tree}{2}{section.3}
-\contentsline {subsection}{\numberline {3.1}Complexity}{2}{subsection.3.1}
-\contentsline {section}{\numberline {4}Test}{2}{section.4}
-\contentsline {section}{\numberline {5}Manual}{4}{section.5}
-\contentsline {subsection}{\numberline {5.1}File Structure}{4}{subsection.5.1}
-\contentsline {section}{\numberline {6}Conclusion}{5}{section.6}
+\contentsline {section}{\numberline {2}Range Queries}{1}{section.2}
+\contentsline {section}{\numberline {3}KD-Tree}{1}{section.3}
+\contentsline {subsection}{\numberline {3.1}Complexity}{1}{subsection.3.1}
+\contentsline {section}{\numberline {4}Range-Tree}{1}{section.4}
+\contentsline {subsection}{\numberline {4.1}Complexity}{1}{subsection.4.1}
+\contentsline {section}{\numberline {5}Test}{1}{section.5}
+\contentsline {subsection}{\numberline {5.1}Test Generation}{1}{subsection.5.1}
+\contentsline {section}{\numberline {6}Manual}{4}{section.6}
+\contentsline {subsection}{\numberline {6.1}File Formats}{4}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Inscrutions}{5}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}File Structure}{5}{subsection.6.3}
+\contentsline {section}{\numberline {7}Conclusion}{5}{section.7}
