@@ -1,0 +1,8 @@
+\contentsline {section}{\numberline {1}KD-Tree}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Complexity}{1}{subsection.1.1}
+\contentsline {section}{\numberline {2}Range-Tree}{1}{section.2}
+\contentsline {subsection}{\numberline {2.1}Complexity}{1}{subsection.2.1}
+\contentsline {section}{\numberline {3}Test}{1}{section.3}
+\contentsline {section}{\numberline {4}Manual}{3}{section.4}
+\contentsline {subsection}{\numberline {4.1}File Structure}{3}{subsection.4.1}
+\contentsline {section}{\numberline {5}Conclusion}{4}{section.5}
