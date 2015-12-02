@@ -42,12 +42,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DOCUMENT START
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Introduction}
+\section{Introduction}
+  This report details the implementation of KD-Tree and Range-Tree in 
+  $n$-dimentions.
 \section{KD-Tree}
 \subsection{Complexity}
 \section{Range-Tree}
 \subsection{Complexity}
 \section{Test}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../src/R/plots/boxplot.pdf}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../src/R/plots/kdmem.pdf}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../src/R/plots/rtmem.pdf}
+\end{figure}
 \section{Manual}
 \subsection{File Structure}
 \begin{verbatim}
@@ -66,7 +80,7 @@ ROOT
     |   |   `-- middleclass.lua
     |   |-- RangeTree.lua
     |   `-- test.lua
-    |-- results
+    |-- results/
     |-- runTests.py
     `-- tests
         |-- createCustomTest.lua
@@ -81,12 +95,4 @@ ROOT
 \end{verbatim}
 
 \section{Conclusion}
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=
-%    \textwidth]{images/part5_2quick.pdf}
-%    \caption{Quicksort \texttt{int} vs. Quicksort \texttt{Integer}. 
-%    \\(\texttt{int}$= 4$ bytes),\texttt{Integer}$= 16$ bytes)}
-%    \label{fig:awesome_image}
-%\end{figure}
 \end{document}
