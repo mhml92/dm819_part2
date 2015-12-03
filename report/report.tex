@@ -113,7 +113,7 @@
   %reporting all points $P_n$ in a range $R_n$.
 \section{KD-Tree}
 This solutions uses elements containing arrays of $d$ floats, each index in the array corresponds to each dimension in the tree.
-The solution is a generalized version of the one IN THE BOOK page. 99, where the one in the book uses 2 dimensions, this one instead
+The solution is a generalized version of the one ``Computational Geometry Algorithms and Applications 3rd Ed'' page. 99, where the one in the book uses 2 dimensions, this one instead
 generalizes the way it handles each dimension, allowing for an arbitrary number of dimensions.
 \subsection{Tree construction - with n-dimensions}
 Like in the book, the tree is constructed by splitting the list of points $P$ on it's median based on the current dimension being split.
@@ -158,14 +158,14 @@ Which can be translated to:
     \texttt{region}_{d,min} = MAX(\texttt{region}_{d,min},halfline),& \text{for right child}
 \end{cases}
 \]
-Where halfline, is the value of the median i.e. the value of the current non-leaf node.
+Where \texttt{halfline}, is the value of the median i.e. the value of the current non-leaf node.
 This means that we narrows our search by reducing the max-value, and increasing our min-value.\\
  \\
 Now checking if the \texttt{region} is fully contained within a range is a simple matter.
-The \texttt{region} is fully contained in the ranges when every minimum and maximum foreach dimension of the \texttt{region} is within every range in $R$.\\
+The \texttt{region} is fully contained in the ranges when every minimum and maximum for each dimension of the \texttt{region} is within every range in $R$.\\
  \\
 The last step is now if the \texttt{region} is not fully contained, we have to check if it is intersecting with the ranges. This comes down to two cases.
-If the \texttt{region} hasn't been constructed yet, so we don't have enoigh information to determine, we have to check further down.
+If the \texttt{region} hasn't been constructed yet, so we don't have enough information to determine, we have to check further down.
 If the \texttt{region} has been constructed, we need to check if any of the ranges of \texttt{region} are within the range $R$ for each dimension respectively, if any of these are true,
 the \texttt{region} is intersecting and we need to check the subtrees.\\
 Note: The search also uses the same technique as the construction, namely the $d = (depth\ mod\ dimension)+1$, when it comes to dimensions.
@@ -182,8 +182,8 @@ The code is included in the appendix, in \textbf{kdtree.lua}.
   within $[x:x']$ in the first level, then determine which of those nodes 
   $y$-coordinate lie within $[y:y']$ on the second level. 
 \section{Manual}
-  \subsection{Inscrutions}
-  To run a test on one of the two trees \textbf{it is nessesary to navigate to 
+  \subsection{Instructions}
+  To run a test on one of the two trees \textbf{it is necessary to navigate to 
   the same directory as the} \verb|test.lua| file which can be found in the 
   directories \verb|src/rangeTree/| and \verb|src/kdtree/|.
   The \verb|test.lua| will read an input file and report the points in the query
@@ -258,7 +258,7 @@ DM819_part2/
   	<real> \t <real>
   	<real>:<real> \t <real>:<real> [, <integer> \t <integer>]
   \end{verbatim}
-  The following exaple illustrates a point set containing 
+  The following example illustrates a point set containing 
   $\{(3,3),(2,2),(1,1),(4,4),(5,5)\}$ and a range $[2:4]\times[2:4]$ along with 
   the optional indexes of the expected points.  
 \begin{lstlisting}
@@ -276,21 +276,27 @@ DM819_part2/
     \includegraphics[width=\textwidth]{../src/R/plots/boxplot.pdf}
     \caption{}
 \end{figure}
-Figure 1 is a boxplot of each algorithms search time for each dimension on all 
+Figure 1 is a box-plot of each algorithms search time for each dimension on all 
 input sizes. It is important to notice the logarithmic scale of the $y$ axis as 
-some outliers are vare fare form the norm. This is especially noticable for the 
-range tree. Since the range tree has enormus memory usage this might be due to 
+some outliers are very fare form the norm. This is especially noticeable for the 
+range tree. Since the range tree has enormous memory usage this might be due to 
 cache misses.
+
+Also note that the range tree is faster than the kd-tree for dimensions below 6.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{../src/R/plots/kdmem.pdf}
     \caption{}
 \end{figure}
+Figure 2: The memory usage of the kd-tree, notice the y-range from 2 trough 6 Mb, for elements 100 to roughly 1500. Also the size doesn't really grow
+when the number of dimensions increases, except for the obvious increase in number of floats used to describe each point.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{../src/R/plots/rtmem.pdf}
     \caption{}
 \end{figure}
+Figure 3: The memory usage of the range tree, notice the y-range from 2 trough 4300 Mb, for elements 100 to roughly 1500.
+Now for each dimension, the memory used increases monstrous when the number of dimensions increases. Which makes it unsuitable for real life applications.
 \newpage
 \section{Conclusion}
 \end{document}
