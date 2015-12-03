@@ -46,10 +46,20 @@
   This report details the implementation of KD-Tree and Range-Tree for 
   $d$-dimensional input. Each tree is constructed from a list of unsorted points
   and is capable of performing orthogonal range queries.
+  \subsection{Definitions}
+  \begin{itemize}
+  	\item a $d$-dimensional point, $p$, consists of real numbers $(p_1,p_2,\dots,p_d)$
+  	\item a $d$-dimensional range, $R$, is a hyper-volume defined by $[r_1:r_1']
+  	\times[r_2:r_2']\times \dots \times [r_d:r_d']$, where each $r$ is a real number
+  \end{itemize}
+
   \subsection{Range Queries}
   Given a set of points, $P$, and a range object, $R$, a range query consist of
   reporting all points in $P$ which intersect $R$ e.g. a 1-dimensional point
-  set $\{1,2,3,4,5\}$ and a range object $[2:4]$ would yield $\{2,3,4\}$. 
+  set $\{1,2,3,4,5\}$ and a range object $[2:4]$ yields $\{2,3,4\}$. 
+  
+  
+  
   %that intersects 
   %a 
   %A point $p \in P$ exists in the range $R$ iff.
@@ -67,50 +77,25 @@
 \subsection{Complexity}
 \section{Range-Tree}
   A Range-tree is a multi-level data structure for time efficient range queries.
-%  
-%  The basic structure of a range tree consist of multiple 1-dimensional binary 
-%  search trees ordered by dimensions.  
-%  An $d$-dimensional Range-tree consist of $d$ levels where each level, $l$, is 
-%  a 1-dimensional range query on the $l$'th  
-%  determining 
-%  canonical subset $P(v)$
-%  associated structure
-%  n-level tree
-\subsection{Complexity}
-\section{Test}
-  \subsection{Test Generation}
+  In 2-dimensional the firs-level of the range tree is a binary search tree on 
+  the $x$-coordinate. Each node has an associated data structure for all
+  points in its canonical set. The associated data structure is a binary 
+  search tree on the $y$-coordinate of the points. 
+  To report which points are in a given range is a 1-dimensional range search 
+  performed for each dimension, that is, first find all leaf nodes which lie 
+  within $[x:x']$ in the first level, then determine which of those nodes 
+  $y$-coordinate lie within $[y:y']$ on the second level. 
+ \section{Test}
+    \subsection{Test Generation}
     Supplied with the code is a test generating script which can create tests of
-    arbitrary dimension and size. The tests are sorted in directories by 
+    arbitrary dimension and size. The tests are stored in directories by 
     dimension.
     
-    In a tests consisting of $n$ points in $d$ dimensions an $d$-dimensional 
+    In a tests consisting of $n$ points in $d$ dimensions a $d$-dimensional 
     volume is constructed with a side length $s = \sqrt[d]{n}$. For each such 
     volume is $1000$ ranges generated with a side length of 
     $rs = \sqrt[d]{0.1 \cdot s^d}$ i.e. each range will contain approximately 
     10\% of the $n$ points. 
-    
-    The generated tests also contains the correct output of each range query.
-    
-  %  $ $1/10$ the size of the    
-    
-%   In each test are points randomly uniformly distributed in $n$ dimensions by 
-%   constructing an $n$-dimensional volume with a 
-% D = {1,2,3,4,5,6}
-%-- number of ranges
-%R = {1000}
-%-- size of dimensions
-%S = function(n,d) return n^(1/d) end
-%-- range sizes
-%range volume
-%$$
-%  \sqrt[d]{n}
-%$$
-%
-%
-%$$
-%  
-%$$
-%$s=$range side  
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{../src/R/plots/boxplot.pdf}
@@ -125,13 +110,15 @@
 \end{figure}
 \section{Manual}
   \subsection{File Formats}
+  \subsubsection{Input}
+  The input file format consist of two distinctest parts: \textit{points} and 
+  \textit{ranges}. 
+  \\
+  \\
+  Points are real numbers separated by \verb|<TAB>|. 
   \begin{verbatim}
   	<real> \t <real>
-  	<real> \t <real>
-  	<real> \t <real>
-  	<real>:<real> \t <real>:<real> , <integer> \t <integer>
-  	<real>:<real> \t <real>:<real> , <integer> \t <integer>
-  	<real>:<real> \t <real>:<real>
+  	<real>:<real> \t <real>:<real> [, <integer> \t <integer>]
   \end{verbatim}
 
   \subsection{Inscrutions}
