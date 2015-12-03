@@ -13,6 +13,43 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage{subcaption}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  otherkeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+
 \usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,positioning,fit,matrix}
 \newcommand{\DepProps}{\textsc{DepProps}}
 \usepackage{titling}
@@ -144,62 +181,27 @@ The code is included in the appendix, in \textbf{kdtree.lua}.
   performed for each dimension, that is, first find all leaf nodes which lie 
   within $[x:x']$ in the first level, then determine which of those nodes 
   $y$-coordinate lie within $[y:y']$ on the second level. 
- \section{Test}
-    \subsection{Test Generation}
-    Supplied with the code is a test generating script which can create tests of
-    arbitrary dimension and size. The tests are stored in directories by 
-    dimension.
-    
-    In a tests consisting of $n$ points in $d$ dimensions a $d$-dimensional 
-    volume is constructed with a side length $s = \sqrt[d]{n}$. For each such 
-    volume is $1000$ ranges generated with a side length of 
-    $rs = \sqrt[d]{0.1 \cdot s^d}$ i.e. each range will contain approximately 
-    10\% of the $n$ points. 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{../src/R/plots/boxplot.pdf}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{../src/R/plots/kdmem.pdf}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{../src/R/plots/rtmem.pdf}
-\end{figure}
-\newpage
 \section{Manual}
-  \subsection{File Formats}
-  \subsubsection{Input}
-  The input file format consist of two distinctest parts: \textit{points} and 
-  \textit{ranges}. 
-  \\
-  \\
-  Points are a real numbers for each dimension separated by \verb|<TAB>| and 
-  each range element is two real number separated by \verb|:| and each dimension
-  is separated by \verb|<TAB>|.
-  \\
-  \\
-  The range part also has an optional \verb|<TAB>| separated list of integers 
-  corresponding to the indexes of the points intersecting the range.  
-  \begin{verbatim}
-  	<real> \t <real>
-  	<real>:<real> \t <real>:<real> [, <integer> \t <integer>]
-  \end{verbatim}
-  
-  \begin{lstlisting}
-  	3	3
-  	2	2
-  	1	1
-  	4	4
-  	5	5
-	2:4	2:4,1	2	4
-  \end{lstlisting}
-  
   \subsection{Inscrutions}
-\subsection{File Structure}
+  To run a test on one of the two trees \textbf{it is nessesary to navigate to 
+  the same directory as the} \verb|test.lua| file which can be found in the 
+  directories \verb|src/rangeTree/| and \verb|src/kdtree/|.
+  The \verb|test.lua| will read an input file and report the points in the query
+  range:
+  \begin{verbatim}
+  	lua test.lua path/to/input.txt
+  \end{verbatim}
+  For performance testing an optional argument \verb|-R| can be passed which 
+  will change the output format to an R readable data frame: 
+  \begin{verbatim}
+  	lua test.lua -R path/to/input.txt
+  \end{verbatim}
+  Supplied with the code is a python script \verb|runTest.py| which will run all 
+  test files in the \verb|tests/| directory and save the results in the R 
+  readable format in the directory \verb|results|.
+\subsubsection{File Structure}
 \begin{verbatim}
-ROOT
+DM819_part2/
 |-- report/
 `-- src
     |-- kdtree
@@ -227,6 +229,68 @@ ROOT
         |-- genTestSuite.lua
         `-- inspect.lua
 \end{verbatim}
-
+  
+    \subsection{Test Generation}
+    The \verb|runTests.py| script can create tests of arbitrary dimension and 
+    size. The tests are stored in the \verb|src/tests/| directory by dimensions.
+    
+    In a tests consisting of $n$ points in $d$ dimensions a $d$-dimensional 
+    volume is constructed with a side length $s = \sqrt[d]{n}$. For each such 
+    volume is $1000$ ranges generated with a side length of 
+    $rs = \sqrt[d]{0.1 \cdot s^d}$ i.e. each range will contain approximately 
+    10\% of the $n$ points. 
+  
+  
+  \subsection{File Formats}
+  \subsubsection{Input}
+  The input file format consist of two distinctest parts: \textit{points} and 
+  \textit{ranges}. 
+  \\
+  \\
+  Points are a real numbers for each dimension separated by \verb|<TAB>| and 
+  each range element is two real number separated by \verb|:| and each dimension
+  is separated by \verb|<TAB>|.
+  \\
+  \\
+  The range part also has an optional \verb|<TAB>| separated list of integers 
+  corresponding to the indexes of the points intersecting the range.  
+  \begin{verbatim}
+  	<real> \t <real>
+  	<real>:<real> \t <real>:<real> [, <integer> \t <integer>]
+  \end{verbatim}
+  The following exaple illustrates a point set containing 
+  $\{(3,3),(2,2),(1,1),(4,4),(5,5)\}$ and a range $[2:4]\times[2:4]$ along with 
+  the optional indexes of the expected points.  
+\begin{lstlisting}
+3	3
+2	2
+1	1
+4	4
+5	5
+2:4	2:4,1	2	4
+\end{lstlisting}
+\newpage
+ \section{Test}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../src/R/plots/boxplot.pdf}
+    \caption{}
+\end{figure}
+Figure 1 is a boxplot of each algorithms search time for each dimension on all 
+input sizes. It is important to notice the logarithmic scale of the $y$ axis as 
+some outliers are vare fare form the norm. This is especially noticable for the 
+range tree. Since the range tree has enormus memory usage this might be due to 
+cache misses.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../src/R/plots/kdmem.pdf}
+    \caption{}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../src/R/plots/rtmem.pdf}
+    \caption{}
+\end{figure}
+\newpage
 \section{Conclusion}
 \end{document}
