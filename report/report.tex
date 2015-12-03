@@ -8,6 +8,7 @@
 \usepackage{fancyvrb}
 \usepackage{booktabs}
 \usepackage{rotating}
+\usepackage{listings}
 \usepackage{tikz}
 \usepackage{float}
 \usepackage{hyperref}
@@ -74,7 +75,65 @@
   %$[x:x']\times[y:y'] \times \dots \times[z:z']$. A range query consist of 
   %reporting all points $P_n$ in a range $R_n$.
 \section{KD-Tree}
-\subsection{Complexity}
+This solutions uses elements containing arrays of $d$ floats, each index in the array corresponds to each dimension in the tree.
+The solution is a generalized version of the one IN THE BOOK page. 99, where the one in the book uses 2 dimensions, this one instead
+generalizes the way it handles each dimension, allowing for an arbitrary number of dimensions.
+\subsection{Tree construction - with n-dimensions}
+Like in the book, the tree is constructed by splitting the list of points $P$ on it's median based on the current dimension being split.
+But unlike the book's version we doesn't just check if depth is even or uneven, we instead formalize the current depth as being
+\[
+ d = (depth\ mod\ dimension)+1
+\]
+Where $dimension$ is a constant equal to the number of dimensions.
+Note the plus 1 in the implementation, this is because that Lua is 1-indexed, so for a 3-dimensional KD-tree, we need indexes from 1 through 3,
+instead of traditional 0 through 2.\\
+ \\
+To help achieve this, we have a function \texttt{splitListOnMedian}, which uses an selection algorithm to find the median, and then return both the median and set $p_1$,$p_2$.
+The points in $p_1$ is all points that are equal or less than the median, the points in $p_2$ is then all points above the median.
+
+The rest of the construction is like like the book's version, call \texttt{BUILDKDTREE} on each set $p_1$,$p_2$ and create a node containing each subtree as it's left and right child, 
+and the node will have the value of the median found.\\
+ \\
+Note: Since the median is inclusive for the left child, we might have unbalanced sets, consider the following set: \{1, 2, 3, 3, 4\}, the median would be 3, but since the behavior for
+constructing the children includes the values that are equal to the median in the lesser set, we would have a node with children \{1, 2, 3, 3\} and \{4\}.
+
+\subsection{Searching the tree - with n-dimensions}
+Like the algorithm for searching in the book, we have 3 cases.
+\begin{itemize}
+ \item Current node \texttt{v} we are looking at, is a leaf. This means that we have to check if that node is contained in our range $R$.
+ \item Left or right- subtree of \texttt{v} are fully contained, if that's the case, we traverse the tree and report all nodes within.
+ \item \texttt{region} are intersecting $R$ but is not fully contained within $R$, this means we have to do the checks again on the children of \texttt{v}.
+\end{itemize}
+But, unlike the book, we have adapt the algorithm to consider more dimensions, this is done by using the \texttt{region}.
+The \texttt{region} is structured just like our $R$, but instead of containing ranges, it contains the minimum and maximum ranges at the current node.
+
+The \texttt{region} starts as a empty set, i.e. we don't know the maximum and minimum at the current nodes. 
+But for each subsequent depth in the tree, we update the \texttt{region} like:
+\[
+    \texttt{region}= 
+    \texttt{region} \cup \texttt{region}(child)
+\]
+Which can be translated to:
+\[
+    \texttt{region}= 
+\begin{cases}
+    \texttt{region}_{d,max} = MIN(\texttt{region}_{d,max},halfline),&\text{for left child} \\
+    \texttt{region}_{d,min} = MAX(\texttt{region}_{d,min},halfline),& \text{for right child}
+\end{cases}
+\]
+Where halfline, is the value of the median i.e. the value of the current non-leaf node.
+This means that we narrows our search by reducing the max-value, and increasing our min-value.\\
+ \\
+Now checking if the \texttt{region} is fully contained within a range is a simple matter.
+The \texttt{region} is fully contained in the ranges when every minimum and maximum foreach dimension of the \texttt{region} is within every range in $R$.\\
+ \\
+The last step is now if the \texttt{region} is not fully contained, we have to check if it is intersecting with the ranges. This comes down to two cases.
+If the \texttt{region} hasn't been constructed yet, so we don't have enoigh information to determine, we have to check further down.
+If the \texttt{region} has been constructed, we need to check if any of the ranges of \texttt{region} are within the range $R$ for each dimension respectively, if any of these are true,
+the \texttt{region} is intersecting and we need to check the subtrees.\\
+Note: The search also uses the same technique as the construction, namely the $d = (depth\ mod\ dimension)+1$, when it comes to dimensions.
+ \\
+The code is included in the appendix, in \textbf{kdtree.lua}.
 \section{Range-Tree}
   A Range-tree is a multi-level data structure for time efficient range queries.
   In 2-dimensional the firs-level of the range tree is a binary search tree on 
