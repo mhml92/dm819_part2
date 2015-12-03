@@ -108,6 +108,7 @@
     \centering
     \includegraphics[width=\textwidth]{../src/R/plots/rtmem.pdf}
 \end{figure}
+\newpage
 \section{Manual}
   \subsection{File Formats}
   \subsubsection{Input}
@@ -115,12 +116,27 @@
   \textit{ranges}. 
   \\
   \\
-  Points are real numbers separated by \verb|<TAB>|. 
+  Points are a real numbers for each dimension separated by \verb|<TAB>| and 
+  each range element is two real number separated by \verb|:| and each dimension
+  is separated by \verb|<TAB>|.
+  \\
+  \\
+  The range part also has an optional \verb|<TAB>| separated list of integers 
+  corresponding to the indexes of the points intersecting the range.  
   \begin{verbatim}
   	<real> \t <real>
   	<real>:<real> \t <real>:<real> [, <integer> \t <integer>]
   \end{verbatim}
-
+  
+  \begin{lstlisting}
+  	3	3
+  	2	2
+  	1	1
+  	4	4
+  	5	5
+	2:4	2:4,1	2	4
+  \end{lstlisting}
+  
   \subsection{Inscrutions}
 \subsection{File Structure}
 \begin{verbatim}
