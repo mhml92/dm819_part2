@@ -90,18 +90,11 @@ local function INTERSECTION(R, region)
 			return true
 		end	
 	end
-	--print("NOT INTERSECTION:")
-	--print("REGION" ..I(region))
-	--print("AND")
-	--print("R" ..I(R))
 	return false
 end
 
 local function REGION(halfline, d, region, orientation)
 	local region = deepcopy(region)
-
-	--print(halfline, d, orientation,"Before: "..I(region))
-
 
 	if orientation == "left" then
 		region[d][2] = math.min(region[d][2] or halfline,halfline)
@@ -109,15 +102,15 @@ local function REGION(halfline, d, region, orientation)
 		region[d][1] = math.max(region[d][1] or halfline,halfline)
 	end
 
-	--print("","","","After: "..I(region))
-
 	return region
 end
 
 local function FULLYCONTAINED(R, region)
-	--if true then return false end
-
 	for i=1,#R do
+		if not (region[i][1] and region[i][2]) then
+			return false
+		end
+
 		if (region[i][1] and region[i][2]) then
 			if not (R[i][1] <= region[i][1] and 
 				    R[i][2] >= region[i][2]) then
@@ -144,37 +137,27 @@ local function SEARCHKDTREE(v, R, region, depth)
 		end
 	end
 
-	--#R[1] == dimension of R
-	
 	if v.left == nil and v.right == nil then
-		if CHECKINRANGE(v.val, R) then 
-			--print("REPORTED MOTHERFUCKER " .. I(v.val)) --should be reported
+		if CHECKINRANGE(v.val, R) then
 			reportfunc(v)
 		end
 	else
-
 		local d = (depth % #R)+1
 		local lregion = REGION(v.val, d, region, "left")
 		local rregion = REGION(v.val, d, region, "right")
 		if FULLYCONTAINED(R, lregion) then
-			--print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.left)) --report whole left tree
 			reportfunc(v.left)
 		else
 			if INTERSECTION(R, lregion) then
 				SEARCHKDTREE(v.left, R, lregion, depth+1)
-			else
-				--print("NOT INTERSECTION" .. I(v))
 			end
 		end
 
 		if FULLYCONTAINED(R, rregion) then
-			--print("REPORTED FULLY CONTAINED !!!! ... " ..I(v.right)) --report whole left tree
 			reportfunc(v.right)
 		else
 			if INTERSECTION(R, rregion) then
 				SEARCHKDTREE(v.right, R, rregion, depth+1)
-			else
-				--print("NOT INTERSECTION" .. I(v))
 			end
 		end
 	end
@@ -200,9 +183,7 @@ local function INITKDSEARCH(tree, R, region)
 	end
 	reportfunc = REPORTSUBTREE
 
-	--print(I(tree))
 
-	--print("TEST INPUT",I(R),I(region))
 	SEARCHKDTREE(tree, R, region, 0)
 
 	return reports
